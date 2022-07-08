@@ -32,18 +32,16 @@ export default class ImageGallery extends Component {
 
           if (total === 0) {
             toast.error('The search has not given any results');
-            this.setState({
-              loader: false,
-            });
+            this.setState({});
             return;
           }
 
           this.setState({
             hits: hits,
             totalPage: Math.ceil(totalHits / 12),
-            loader: false,
           });
-        });
+        })
+        .finally(() => this.setState({ loader: false }));
     } else if (this.state.page > prevState.page) {
       this.setState({ loader: true });
       fetch(
@@ -53,9 +51,9 @@ export default class ImageGallery extends Component {
         .then(data => {
           this.setState({
             hits: [...prevState.hits, ...data.hits],
-            loader: false,
           });
-        });
+        })
+        .finally(() => this.setState({ loader: false }));
     }
   }
 
