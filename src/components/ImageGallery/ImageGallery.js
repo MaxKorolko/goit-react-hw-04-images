@@ -32,6 +32,9 @@ export default class ImageGallery extends Component {
 
           if (total === 0) {
             toast.error('The search has not given any results');
+            this.setState({
+              loader: false,
+            });
             return;
           }
 
@@ -40,12 +43,7 @@ export default class ImageGallery extends Component {
             totalPage: Math.ceil(totalHits / 12),
             loader: false,
           });
-        })
-        .finally(
-          this.setState({
-            loader: false,
-          })
-        );
+        });
     } else if (this.state.page > prevState.page) {
       this.setState({ loader: true });
       fetch(
