@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Section from './Section/Section';
@@ -23,6 +25,7 @@ export default class App extends Component {
         <Section>
           <ImageGallery request={this.state.request} />
         </Section>
+        <ToastContainer autoClose={2500} />
       </div>
     );
   }

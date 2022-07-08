@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import s from './SearchBar.module.css';
 import { ReactComponent as SearchIcon } from '../icons/searchIcon.svg';
 
@@ -18,6 +19,10 @@ export default class Searcbar extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
+    if (this.state.input.trim() === '') {
+      toast.error('search cannot be an empty string');
+      return;
+    }
     this.props.onGetRequest(this.state.input.trim().toLowerCase());
     this.reset();
   };

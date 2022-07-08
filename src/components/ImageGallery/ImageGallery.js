@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import Button from '../Button/Button';
@@ -27,13 +28,24 @@ export default class ImageGallery extends Component {
       )
         .then(res => res.json())
         .then(data => {
-          const { hits, totalHits } = data;
+          const { hits, totalHits, total } = data;
+
+          if (total === 0) {
+            toast.error('The search has not given any results');
+            return;
+          }
+
           this.setState({
             hits: hits,
             totalPage: Math.ceil(totalHits / 12),
             loader: false,
           });
-        });
+        })
+        .finally(
+          this.setState({
+            loader: false,
+          })
+        );
     } else if (this.state.page > prevState.page) {
       this.setState({ loader: true });
       fetch(
