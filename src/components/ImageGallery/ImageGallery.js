@@ -10,7 +10,6 @@ import Modal from '../Modal/Modal';
 export default class ImageGallery extends Component {
   state = {
     hits: [],
-    page: 1,
     totalPage: null,
     loader: false,
     showModal: false,
@@ -18,13 +17,15 @@ export default class ImageGallery extends Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
+    const { page } = this.props;
     const prevRequest = prevProps.request;
     const newRequest = this.props.request;
     const API_KEY = '28033365-ba4821d388ed22fecf976971a';
-    if (prevRequest !== newRequest) {
-      this.setState({ page: 1, loader: true });
+
+    if (prevRequest !== newRequest || page > prevProps.page) {
+      this.setState({ loader: true });
       fetch(
-        `https://pixabay.com/api/?q=${newRequest}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
+        `https://pixabay.com/api/?q=${newRequest}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
       )
         .then(res => res.json())
         .then(data => {
@@ -32,26 +33,18 @@ export default class ImageGallery extends Component {
 
           if (total === 0) {
             toast.error('The search has not given any results');
-            this.setState({});
             return;
           }
-
-          this.setState({
-            hits: hits,
-            totalPage: Math.ceil(totalHits / 12),
-          });
-        })
-        .finally(() => this.setState({ loader: false }));
-    } else if (this.state.page > prevState.page) {
-      this.setState({ loader: true });
-      fetch(
-        `https://pixabay.com/api/?q=${prevRequest}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then(res => res.json())
-        .then(data => {
-          this.setState({
-            hits: [...prevState.hits, ...data.hits],
-          });
+          if (page === 1) {
+            this.setState({
+              hits: hits,
+              totalPage: Math.ceil(totalHits / 12),
+            });
+          } else {
+            this.setState({
+              hits: [...prevState.hits, ...data.hits],
+            });
+          }
         })
         .finally(() => this.setState({ loader: false }));
     }
@@ -65,16 +58,9 @@ export default class ImageGallery extends Component {
     this.setState(state => ({ showModal: !state.showModal }));
   };
 
-  loadMore = () => {
-    this.setState(prevState => {
-      return {
-        page: prevState.page + 1,
-      };
-    });
-  };
-
   render() {
-    const { hits, page, totalPage, loader, showModal, modalURL } = this.state;
+    const { hits, totalPage, loader, showModal, modalURL } = this.state;
+    const { page, loadMore } = this.props;
     return (
       <>
         <ul className={s.gallery}>
@@ -85,9 +71,7 @@ export default class ImageGallery extends Component {
           />
         </ul>
         {loader && <Loader />}
-        {totalPage > 1 && totalPage !== page && (
-          <Button loadMore={this.loadMore} />
-        )}
+        {totalPage > 1 && totalPage !== page && <Button loadMore={loadMore} />}
         {showModal && <Modal url={modalURL} onToggleModal={this.toggleModal} />}
       </>
     );
@@ -96,4 +80,6 @@ export default class ImageGallery extends Component {
 
 ImageGallery.propTypes = {
   request: PropTypes.string.isRequired,
+  loadMore: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
 };
