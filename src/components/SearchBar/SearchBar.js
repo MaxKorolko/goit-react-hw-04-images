@@ -1,52 +1,39 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import s from './SearchBar.module.css';
 import { ReactComponent as SearchIcon } from '../icons/searchIcon.svg';
 
-export default class Searcbar extends Component {
-  state = {
-    input: '',
-  };
+export default function Searcbar({ onGetRequest }) {
+  const [input, setInput] = useState('');
 
-  handleInputChange = event => {
-    this.setState({ input: event.currentTarget.value });
-  };
-
-  reset = () => {
-    this.setState({ input: '' });
-  };
-
-  handleSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault();
-    if (this.state.input.trim() === '') {
-      toast.error('search cannot be an empty string');
-      return;
+    if (input.trim() === '') {
+      return toast.error('search cannot be an empty string');
     }
-    this.props.onGetRequest(this.state.input.trim().toLowerCase());
-    this.reset();
+    onGetRequest(input.trim().toLowerCase());
+    setInput('');
   };
 
-  render() {
-    return (
-      <header className={s.searchBar}>
-        <form className={s.searchForm} onSubmit={this.handleSubmit}>
-          <input
-            className={s.input}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            value={this.state.input}
-            onChange={this.handleInputChange}
-          ></input>
-          <button className={s.btn} type="submit">
-            <SearchIcon width="28" height="28" fill="black" />
-          </button>
-        </form>
-      </header>
-    );
-  }
+  return (
+    <header className={s.searchBar}>
+      <form className={s.searchForm} onSubmit={handleSubmit}>
+        <input
+          className={s.input}
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          value={input}
+          onChange={event => setInput(event.currentTarget.value)}
+        ></input>
+        <button className={s.btn} type="submit">
+          <SearchIcon width="28" height="28" fill="black" />
+        </button>
+      </form>
+    </header>
+  );
 }
 
 Searcbar.propTypes = {

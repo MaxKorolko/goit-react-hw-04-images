@@ -1,36 +1,35 @@
-import React, { Component } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import s from './Modal.module.css';
 import { createPortal } from 'react-dom';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export default class Modal extends Component {
-  componentDidMount() {
+export default function Modal({ url, onToggleModal }) {
+  useEffect(() => {
     const backDrop = document.querySelector('#backDrop');
-    window.addEventListener('keydown', this.closeModal);
-    backDrop.addEventListener('click', this.closeModal);
-  }
+    window.addEventListener('keydown', closeModal);
+    backDrop.addEventListener('click', closeModal);
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.closeModal);
-  }
+    return () => {
+      window.removeEventListener('keydown', closeModal);
+    };
+  });
 
-  closeModal = event => {
+  const closeModal = event => {
     if (event.code === 'Escape' || event.target === event.currentTarget) {
-      this.props.onToggleModal();
+      onToggleModal();
     }
   };
-  render() {
-    return createPortal(
-      <div className={s.overlay} id="backDrop">
-        <div className={s.modal}>
-          <img src={this.props.url} alt="" />
-        </div>
-      </div>,
-      modalRoot
-    );
-  }
+
+  return createPortal(
+    <div className={s.overlay} id="backDrop">
+      <div className={s.modal}>
+        <img src={url} alt="" />
+      </div>
+    </div>,
+    modalRoot
+  );
 }
 
 Modal.propTypes = {

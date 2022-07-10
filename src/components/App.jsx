@@ -1,46 +1,30 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Section from './Section/Section';
 
-// import Button from './Button/Button';
+export default function App() {
+  const [request, setRequest] = useState('');
+  const [page, setPage] = useState(1);
 
-export default class App extends Component {
-  state = {
-    request: '',
-    page: 1,
-  };
-
-  addRequest = newRequest => {
-    if (this.state.request !== newRequest) {
-      this.setState({ request: newRequest.toLowerCase(), page: 1 });
+  const addRequest = newRequest => {
+    if (request !== newRequest) {
+      setRequest(newRequest.toLowerCase());
+      setPage(1);
     }
   };
 
-  loadMore = () => {
-    this.setState(prevState => {
-      return {
-        page: prevState.page + 1,
-      };
-    });
-  };
+  const loadMore = () => setPage(prevState => prevState + 1);
 
-  render() {
-    const { request, page } = this.state;
-    return (
-      <div>
-        <Searchbar onGetRequest={this.addRequest} />
-        <Section>
-          <ImageGallery
-            request={request}
-            page={page}
-            loadMore={this.loadMore}
-          />
-        </Section>
-        <ToastContainer autoClose={2500} />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Searchbar onGetRequest={addRequest} />
+      <Section>
+        <ImageGallery request={request} page={page} loadMore={loadMore} />
+      </Section>
+      <ToastContainer autoClose={2500} />
+    </div>
+  );
 }
